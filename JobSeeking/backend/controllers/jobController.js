@@ -67,61 +67,81 @@ export const postJob = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+
+
+
+// jobs posted by the user
 export const getMyJobs = catchAsyncErrors(async (req, res, next) => {
   const { role } = req.user;
+
   if (role === "Job Seeker") {
     return next(
-      new ErrorHandler("Job Seeker not allowed to access this resource.", 400)
+      new ErrorHandler("Access denied. Job Seekers cannot view this resource.", 403)
     );
   }
+
   const myJobs = await Job.find({ postedBy: req.user._id });
+
   res.status(200).json({
     success: true,
-    myJobs,
+    jobs: myJobs,
   });
 });
 
+// Update a job
 export const updateJob = catchAsyncErrors(async (req, res, next) => {
   const { role } = req.user;
+
   if (role === "Job Seeker") {
     return next(
-      new ErrorHandler("Job Seeker not allowed to access this resource.", 400)
+      new ErrorHandler("Access denied. Job Seekers cannot update jobs.", 403)
     );
   }
+
   const { id } = req.params;
   let job = await Job.findById(id);
+
   if (!job) {
-    return next(new ErrorHandler("OOPS! Job not found.", 404));
+    return next(new ErrorHandler("Job not found.", 404));
   }
+
   job = await Job.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
+
   res.status(200).json({
     success: true,
-    message: "Job Updated!",
+    message: "Job updated successfully!",
   });
 });
 
+// Delete a job
 export const deleteJob = catchAsyncErrors(async (req, res, next) => {
   const { role } = req.user;
+
   if (role === "Job Seeker") {
     return next(
-      new ErrorHandler("Job Seeker not allowed to access this resource.", 400)
+      new ErrorHandler("Access denied. Job Seekers cannot delete jobs.", 403)
     );
   }
+
   const { id } = req.params;
   const job = await Job.findById(id);
+
   if (!job) {
-    return next(new ErrorHandler("OOPS! Job not found.", 404));
+    return next(new ErrorHandler("Job not found.", 404));
   }
+
   await job.deleteOne();
+
   res.status(200).json({
     success: true,
-    message: "Job Deleted!",
+    message: "Job deleted successfully!",
   });
 });
+
 
 export const getSingleJob = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
