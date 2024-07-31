@@ -1,4 +1,4 @@
-# LinkedUp (Job Seeking Website)
+# JobZee (Job Seeking Website)
 
 ## Overview
 
